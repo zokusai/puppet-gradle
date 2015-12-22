@@ -53,7 +53,8 @@ class gradle(
   $url      = 'UNSET',
   $target   = 'UNSET',
   $timeout  = 120,
-  $daemon   = true
+  $daemon   = true,
+  $proxy    = undef,
 ) {
 
   include gradle::params
@@ -96,11 +97,12 @@ class gradle(
     root_dir   => "gradle-${version_real}",
     extension  => 'zip',
     timeout    => $timeout,
+    proxy      => $proxy,
   }
 
   file { $target_real:
     ensure  => link,
-    target  => "/opt/gradle-${version_real}",
+    target  => "/opt/gradle-${version_real}/gradle-${version_real}",
     require => Archive["gradle-${version_real}-all.zip"],
   }
 
