@@ -1,6 +1,6 @@
 {
 	"name": "gini-gradle",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"author": "Jochen Schalanda",
 	"summary": "Puppet module for installing the Gradle build tool from the official distribution",
 	"license": "Apache-2.0",
