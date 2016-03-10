@@ -46,64 +46,49 @@
 # === Copyright
 #
 # Copyright 2012, 2013 smarchive GmbH, 2013 Gini GmbH
-#
+#--
+# TODO: Retrieve lastest version info from https://services.gradle.org/versions/current
+#--
 class gradle(
-  $version  = 'UNSET',
-  $base_url = 'UNSET',
-  $url      = 'UNSET',
-  $target   = 'UNSET',
-  $timeout  = 120,
-  $daemon   = true,
-  $proxy    = undef,
+  $version      = '2.11',
+  $dist         = 'all',
+  $base_url     = 'https://services.gradle.org/distributions',
+  $url          = undef,
+  $download_dir = '/tmp',
+  $target       = '/opt',
+  $timeout      = 300,
+  $daemon       = true,
+  $proxy        = undef,
+  $user         = undef,
+  $group        = undef,
 ) {
 
-  include gradle::params
-
-  $version_real = $version ? {
-    'UNSET' => $::gradle::params::version,
-    default => $version,
-  }
-
-  $base_url_real = $base_url ? {
-    'UNSET' => $::gradle::params::base_url,
-    default => $base_url,
-  }
-
-  $url_real = $url ? {
-    'UNSET' => "${base_url_real}/gradle-${version_real}-all.zip",
-    default => $url,
-  }
-
-  $target_real = $target ? {
-    'UNSET' => $::gradle::params::target,
-    default => $target,
-  }
+  $url_real = pick($url , "${base_url}/gradle-${version}-${dist}.zip")
 
   Exec {
     path  => [
       '/usr/local/sbin', '/usr/local/bin',
       '/usr/sbin', '/usr/bin', '/sbin', '/bin',
     ],
-    user  => 'root',
-    group => 'root',
+    user  => $user,
+    group => $group,
   }
 
-  archive { "gradle-${version_real}-all.zip":
+  archive { "gradle-${version}-${dist}.zip":
     ensure     => present,
     url        => $url_real,
     checksum   => false,
-    src_target => '/var/tmp',
-    target     => '/opt',
-    root_dir   => "gradle-${version_real}",
+    src_target => $download_dir,
+    target     => $target,
     extension  => 'zip',
     timeout    => $timeout,
     proxy      => $proxy,
   }
 
-  file { $target_real:
+  file { "${target}/gradle":
     ensure  => link,
-    target  => "/opt/gradle-${version_real}/gradle-${version_real}",
-    require => Archive["gradle-${version_real}-all.zip"],
+    target  => "${target}/gradle-${version}",
+    require => Archive["gradle-${version}-${dist}.zip"],
   }
 
   file { '/etc/profile.d/gradle.sh':
