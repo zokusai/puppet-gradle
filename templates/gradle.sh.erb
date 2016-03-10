@@ -1,7 +1,7 @@
 # Mantained with Puppet
 
-export GRADLE_HOME=<%= @target_real %>
-export PATH="$PATH:<%= @target_real %>/bin"
+export GRADLE_HOME=<%= @gradle_home %>
+export PATH="${GRADLE_HOME}/bin:${PATH}"
 <% if @daemon %>
 export GRADLE_OPTS="-Dorg.gradle.daemon=true"
 <% end %>

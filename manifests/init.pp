@@ -63,7 +63,10 @@ class gradle(
   $group        = undef,
 ) {
 
-  $url_real = pick($url , "${base_url}/gradle-${version}-${dist}.zip")
+  $gradle_basename = "gradle-${version}"
+  $gradle_home     = "${target}/gradle"
+
+  $url_real = pick($url , "${base_url}/${gradle_basename}-${dist}.zip")
 
   Exec {
     path  => [
@@ -74,21 +77,22 @@ class gradle(
     group => $group,
   }
 
-  archive { "gradle-${version}-${dist}.zip":
+  archive { "${gradle_basename}-${dist}.zip":
     ensure     => present,
     url        => $url_real,
     checksum   => false,
     src_target => $download_dir,
     target     => $target,
+    root_dir   => $gradle_basename,
     extension  => 'zip',
     timeout    => $timeout,
     proxy      => $proxy,
   }
 
-  file { "${target}/gradle":
+  file { $gradle_home:
     ensure  => link,
-    target  => "${target}/gradle-${version}",
-    require => Archive["gradle-${version}-${dist}.zip"],
+    target  => "${target}/${gradle_basename}/${gradle_basename}",
+    require => Archive["${gradle_basename}-${dist}.zip"],
   }
 
   file { '/etc/profile.d/gradle.sh':
